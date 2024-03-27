@@ -1,5 +1,22 @@
+use std::collections::HashMap;
+
 fn unique(a: Vec<i32>) -> Vec<i32> {
-    todo!()
+    if a.is_empty() {
+        return vec![];
+    }
+    
+    let mut unique_map: HashMap<i32, i32> = HashMap::new();
+    let mut unique_vec = vec![];
+    for i in a {
+        match unique_map.get(&i) {
+            Some(i) => println!("Already present {i}"),
+            None => {
+                unique_map.insert(i, i);
+                unique_vec.push(i);
+            }
+        }
+    }
+    unique_vec
 }
 
 // advanced 1: use generic types
