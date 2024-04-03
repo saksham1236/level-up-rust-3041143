@@ -1,6 +1,8 @@
 #![allow(dead_code)]
 
-#[derive(Debug, PartialEq)]
+use std::collections::HashMap;
+
+#[derive(Debug, Hash, Eq, PartialEq)]
 enum Card {
     Ace,
     Two,
@@ -19,12 +21,11 @@ enum Card {
 struct Hand {
     cards: Vec<Card>,
 }
+use crate::Card::*;
 
 impl Hand {
     fn new() -> Self {
-        Hand {
-            cards: vec![],
-        }
+        Hand { cards: vec![] }
     }
 
     fn add(&mut self, card: Card) {
@@ -32,8 +33,31 @@ impl Hand {
     }
 
     fn value(&self) -> usize {
-        // TODO: implement this method
-        0 
+        let card_map: HashMap<Card, _> = HashMap::from([
+            (Ace, 11),
+            (Two, 2),
+            (Three, 3),
+            (Four, 4),
+            (Five, 5),
+            (Six, 6),
+            (Seven, 7),
+            (Eight, 8),
+            (Nine, 9),
+            (Jack, 10),
+            (King, 10),
+            (Queen, 10),
+        ]);
+
+        let mut val = 0;
+        for card in &self.cards {
+            if card == &Ace {
+                val += if val > 11 { 1 } else { 11 }
+            } else {
+                val += card_map.get(card).unwrap();
+            }
+        }
+
+        val
     }
 
     fn is_loosing_hand(&self) -> bool {
@@ -45,8 +69,8 @@ fn main() {
     let mut hand = Hand::new();
     hand.add(Card::King);
     hand.add(Card::Ace);
+    println!("{}", hand.value())
 }
-
 
 #[test]
 fn empty_hand() {
@@ -70,7 +94,7 @@ fn risky_hand() {
     hand.add(Card::King);
     hand.add(Card::Queen);
     hand.add(Card::Ace);
-    
+
     assert_eq!(hand.value(), 21);
 }
 
@@ -80,7 +104,7 @@ fn oops() {
     hand.add(Card::King);
     hand.add(Card::Seven);
     hand.add(Card::Five);
-    
+
     assert!(hand.is_loosing_hand());
     assert_eq!(hand.value(), 22);
 }
