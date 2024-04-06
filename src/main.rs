@@ -9,6 +9,10 @@ fn sum_with_missing(numbers: Vec<Option<i32>>) -> i32 {
     sum
 }
 
+fn sum_with_missing_solution(numbers: Vec<Option<i32>>) -> i32 {
+    numbers.iter().map(|x| x.unwrap_or(0)).sum()
+}
+
 fn main() {
     println!("");
     let nn = vec![];
@@ -30,7 +34,7 @@ fn no_missing() {
 #[test]
 fn some_missing() {
     let nn = vec![None, Some(1), Some(5), Some(4), None, None];
-    assert_eq!(sum_with_missing(nn), 10);
+    assert_eq!(sum_with_missing_solution(nn), 10);
 }
 
 #[test]
