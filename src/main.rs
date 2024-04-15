@@ -4,12 +4,35 @@ struct Isbn {
     raw: String,
     digits: Vec<u8>,
 }
+#[derive(Debug)]
+enum ParseError {
+    Long,
+    Short,
+    Invalid,
+}
 
 impl FromStr for Isbn {
-    type Err = (); // TODO: replace with appropriate type
+    type Err = ParseError; // TODO: replace with appropriate type
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        todo!();        
+        let pure_num = s.replace("-", "");
+        let x = pure_num.chars().count();
+
+        match x == 13 {
+            true => (),
+            false => {
+                if x > 13 {
+                    return Err(ParseError::Long);
+                } else {
+                    return Err(ParseError::Short);
+                }
+            }
+        }
+        let parsed_isbn = Isbn {
+            raw: s.to_string(),
+            digits: pure_num.chars().map(|x| (x as u8)).collect(),
+        };
+        Ok(parsed_isbn)
     }
 }
 
