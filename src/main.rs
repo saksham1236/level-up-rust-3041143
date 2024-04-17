@@ -15,7 +15,7 @@ impl FromStr for Isbn {
     type Err = ParseError; // TODO: replace with appropriate type
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let pure_num = s.replace("-", "");
+        let pure_num = s.replace('-', "");
         let x = pure_num.chars().count();
 
         match x == 13 {
@@ -30,8 +30,17 @@ impl FromStr for Isbn {
         }
         let parsed_isbn = Isbn {
             raw: s.to_string(),
-            digits: pure_num.chars().map(|x| (x as u8)).collect(),
+            digits: pure_num.chars().map(|x| (x as u8 - 0x30)).collect(),
+            // x as u8 - 0x30 from https://stackoverflow.com/questions/43983414/how-to-convert-a-rust-char-to-an-integer-so-that-1-becomes-1
+            //Char carries a scalar value compared to &str and String, need to convert or subtract ascii 0 or 0x30
         };
+
+        let mut temp = parsed_isbn.digits.clone();
+        temp.truncate(temp.len() - 1);
+
+        if calculate_check_digit(&temp) != *parsed_isbn.digits.last().unwrap() {
+            return Err(ParseError::Invalid);
+        }
         Ok(parsed_isbn)
     }
 }
@@ -44,7 +53,20 @@ impl std::fmt::Display for Isbn {
 
 // https://en.wikipedia.org/wiki/International_Standard_Book_Number#ISBN-13_check_digit_calculation
 fn calculate_check_digit(digits: &[u8]) -> u8 {
-    todo!()
+    let mut check_digit: u8 = 0;
+    for (i, num) in digits.iter().enumerate() {
+        if i % 2 == 0 {
+            check_digit += num;
+        } else {
+            check_digit += num * 3;
+        }
+    }
+    let check_digit = 10 - (check_digit % 10);
+    if check_digit == 10 {
+        0_u8
+    } else {
+        check_digit
+    }
 }
 
 fn main() {
