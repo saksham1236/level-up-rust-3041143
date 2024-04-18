@@ -1,3 +1,4 @@
+use std::fs::{self, OpenOptions}; //Use self for importing self
 use std::path;
 
 trait FileMetadata {
@@ -10,20 +11,20 @@ trait FileMetadata {
 
 impl FileMetadata for path::Path {
     fn is_readable(&self) -> bool {
-        todo!();
+        OpenOptions::new().read(true).open(self).is_ok()
     }
 
     fn is_writeable(&self) -> bool {
-        todo!();
+        OpenOptions::new().write(true).open(self).is_ok()
     }
 
     fn exists(&self) -> bool {
-        todo!();
+        fs::metadata(self).is_ok()
     }
 }
 
 fn main() {
-    // 
+    //
 }
 
 #[test]
